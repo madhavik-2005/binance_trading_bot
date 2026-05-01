@@ -11,15 +11,18 @@ class BinanceClient:
             api_key = os.getenv("API_KEY")
             api_secret = os.getenv("API_SECRET")
 
-        # 🔥 Debug check (IMPORTANT)
         if not api_key or not api_secret:
-            raise ValueError("API keys not found. Check Streamlit secrets or .env")
+            raise ValueError("❌ API keys missing")
 
-        self.client = Client(api_key, api_secret)
+        # 🔥 FIX: disable ping during init
+        self.client = Client(api_key, api_secret, ping=False)
 
-        # ✅ FIX: Force TESTNET endpoints
+        # ✅ NOW override URLs
         self.client.API_URL = "https://testnet.binance.vision/api"
         self.client.FUTURES_URL = "https://testnet.binancefuture.com/fapi"
+
+        # ✅ OPTIONAL: manually test connection
+        self.client.ping()
 
     def get_client(self):
         return self.client
