@@ -1,27 +1,24 @@
-import os
 from binance.client import Client
-from dotenv import load_dotenv
-
-# Load .env locally
-load_dotenv()
-
-def get_keys():
-    try:
-        import streamlit as st
-        return st.secrets["API_KEY"], st.secrets["API_SECRET"]
-    except:
-        return os.getenv("API_KEY"), os.getenv("API_SECRET")
+import streamlit as st
+import os
 
 class BinanceClient:
     def __init__(self):
-        api_key, api_secret = get_keys()
+        try:
+            api_key = st.secrets["API_KEY"]
+            api_secret = st.secrets["API_SECRET"]
+        except:
+            api_key = os.getenv("API_KEY")
+            api_secret = os.getenv("API_SECRET")
 
-        self.client = Client(
-            api_key,
-            api_secret,
-            testnet=True
-        )
+        # 🔥 Debug check (IMPORTANT)
+        if not api_key or not api_secret:
+            raise ValueError("API keys not found. Check Streamlit secrets or .env")
 
+        self.client = Client(api_key, api_secret)
+
+        # ✅ FIX: Force TESTNET endpoints
+        self.client.API_URL = "https://testnet.binance.vision/api"
         self.client.FUTURES_URL = "https://testnet.binancefuture.com/fapi"
 
     def get_client(self):
